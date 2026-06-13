@@ -100,8 +100,41 @@ export class AdminService {
     };
   }
 
+  updateCareer(
+    id: number,
+    dto: Parameters<CatalogService['updateCareer']>[1],
+  ) {
+    return this.catalogService.updateCareer(id, dto);
+  }
+
   createBuilding(dto: Parameters<CatalogService['createBuilding']>[0]) {
     return this.catalogService.createBuilding(dto);
+  }
+
+  updateBuilding(
+    id: number,
+    dto: Parameters<CatalogService['updateBuilding']>[1],
+  ) {
+    return this.catalogService.updateBuilding(id, dto);
+  }
+
+  getSubjects(query: Parameters<CatalogService['getSubjects']>[0]) {
+    return this.catalogService.getSubjects(query);
+  }
+
+  createSubject(dto: Parameters<CatalogService['createSubject']>[0]) {
+    return this.catalogService.createSubject(dto);
+  }
+
+  updateSubject(
+    id: number,
+    dto: Parameters<CatalogService['updateSubject']>[1],
+  ) {
+    return this.catalogService.updateSubject(id, dto);
+  }
+
+  deleteSubject(id: number) {
+    return this.catalogService.deleteSubject(id);
   }
 
   async deleteBuilding(id: number) {
