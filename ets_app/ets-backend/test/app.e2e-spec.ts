@@ -1,29 +1,37 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
 import request from 'supertest';
-import { App } from 'supertest/types';
-import { AppModule } from './../src/app.module';
 
-describe('AppController (e2e)', () => {
-  let app: INestApplication<App>;
+import { AppController } from '../src/app.controller.js';
+import { AppService } from '../src/app.service.js';
 
-  beforeEach(async () => {
+// e2e de la capa HTTP (sin base de datos): arranca un Nest real con el
+// controlador de salud y verifica las respuestas vía supertest. La e2e contra
+// la base de datos completa requiere Postgres y el runner ESM de jest.
+describe('API ETS ESCOM (e2e)', () => {
+  let app: INestApplication;
+
+  beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
+      controllers: [AppController],
+      providers: [AppService],
     }).compile();
 
     app = moduleFixture.createNestApplication();
     await app.init();
   });
 
-  it('/ (GET)', () => {
-    return request(app.getHttpServer())
-      .get('/')
-      .expect(200)
-      .expect('Hello World!');
+  afterAll(async () => {
+    await app.close();
   });
 
-  afterEach(async () => {
-    await app.close();
+  it('GET / responde 200 con el estado de la API', async () => {
+    const res = await request(app.getHttpServer()).get('/').expect(200);
+    expect(res.body.status).toBe('ok');
+    expect(res.body.name).toBe('ETS ESCOM API');
+  });
+
+  it('GET /ruta-inexistente responde 404', async () => {
+    await request(app.getHttpServer()).get('/ruta-inexistente').expect(404);
   });
 });
