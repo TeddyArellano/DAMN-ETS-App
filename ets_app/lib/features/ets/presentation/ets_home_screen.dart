@@ -16,6 +16,7 @@ import '../domain/entities/ets.dart';
 import 'ets_providers.dart';
 import 'favorites_provider.dart';
 import 'utils/ics_export.dart';
+import 'utils/pdf_export.dart';
 
 Career? _findCareerByCode(List<Career> careers, String? code) {
   if (code == null) {
@@ -232,6 +233,23 @@ class _EtsHomeScreenState extends ConsumerState<EtsHomeScreen> {
     ]);
   }
 
+  Future<void> _exportResultsPdf(List<Ets> items) async {
+    try {
+      await exportEtsCalendarToPdf(
+        items,
+        title: 'Calendario de ETS',
+        filename: 'ets_consulta.pdf',
+      );
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No se pudo generar el PDF.')),
+      );
+    }
+  }
+
   @override
   void dispose() {
     _searchController.dispose();
@@ -370,6 +388,16 @@ class _EtsHomeScreenState extends ConsumerState<EtsHomeScreen> {
                                     '${result.items.length} ${result.items.length == 1 ? 'examen' : 'exámenes'}',
                                 tone: BadgeTone.info,
                                 mono: true,
+                              ),
+                              const Spacer(),
+                              IconButton(
+                                tooltip: 'Exportar resultados a PDF',
+                                onPressed: () =>
+                                    _exportResultsPdf(result.items),
+                                icon: const Icon(
+                                  Icons.picture_as_pdf_outlined,
+                                  color: AppColors.primary,
+                                ),
                               ),
                             ],
                           ),
