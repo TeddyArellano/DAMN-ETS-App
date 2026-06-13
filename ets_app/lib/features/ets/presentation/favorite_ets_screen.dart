@@ -14,6 +14,7 @@ import '../domain/entities/ets.dart';
 import 'ets_providers.dart';
 import 'favorites_provider.dart';
 import 'utils/ics_export.dart';
+import 'utils/pdf_export.dart';
 
 enum _ReminderOption {
   now,
@@ -232,6 +233,21 @@ class _FavoriteEtsScreenState extends ConsumerState<FavoriteEtsScreen> {
       );
   }
 
+  Future<void> _exportFavoritesPdf(List<Ets> items) async {
+    try {
+      await exportEtsCalendarToPdf(
+        items,
+        title: 'Mis ETS favoritos',
+        filename: 'ets_favoritos.pdf',
+      );
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+      _showMessage('No se pudo generar el PDF.');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final user = ref.watch(authControllerProvider).asData?.value;
@@ -400,28 +416,34 @@ class _FavoriteEtsScreenState extends ConsumerState<FavoriteEtsScreen> {
                     ),
                   ),
                   const SizedBox(height: 8),
-                    OutlinedButton.icon(
+                  FilledButton.icon(
+                    onPressed: () => _exportFavoritesPdf(favoriteItems),
+                    icon: const Icon(Icons.picture_as_pdf_outlined, size: 18),
+                    label: const Text('Exportar calendario a PDF'),
+                  ),
+                  const SizedBox(height: 8),
+                  OutlinedButton.icon(
                     onPressed: () async {
-                        final confirmed = await _confirmClearFavorites();
+                      final confirmed = await _confirmClearFavorites();
 
-                        if (!confirmed) {
+                      if (!confirmed) {
                         return;
-                        }
+                      }
 
-                        await ref
-                            .read(favoritesProvider.notifier)
-                            .clearFavorites();
+                      await ref
+                          .read(favoritesProvider.notifier)
+                          .clearFavorites();
 
-                        if (!context.mounted) {
+                      if (!context.mounted) {
                         return;
-                        }
+                      }
 
-                        _showMessage('Todos los favoritos fueron eliminados.');
+                      _showMessage('Todos los favoritos fueron eliminados.');
                     },
                     icon: const Icon(Icons.delete_sweep_outlined),
                     label: const Text('Limpiar todos los favoritos'),
-                    ),
-                    const SizedBox(height: 14),
+                  ),
+                  const SizedBox(height: 14),
                   Card(
                     child: Padding(
                       padding: const EdgeInsets.all(22),
