@@ -24,8 +24,15 @@ class AdminDashboardScreen extends ConsumerWidget {
         appBar: AppBar(
           toolbarHeight: 64,
           titleSpacing: 20,
+          flexibleSpace: const SafeArea(
+            child: Align(
+              alignment: Alignment.topCenter,
+              child: BrandAccentBar(),
+            ),
+          ),
           title: const BrandLockup(subtitle: 'Panel administrativo'),
           actions: [
+            const _PeriodoBadge(),
             _AdminChip(name: user?.name ?? 'Administrador'),
             IconButton(
               tooltip: 'Cerrar sesión',
@@ -65,6 +72,31 @@ class AdminDashboardScreen extends ConsumerWidget {
   }
 }
 
+class _PeriodoBadge extends StatelessWidget {
+  const _PeriodoBadge();
+
+  @override
+  Widget build(BuildContext context) {
+    if (MediaQuery.sizeOf(context).width < 560) {
+      return const SizedBox.shrink();
+    }
+    return Padding(
+      padding: const EdgeInsets.only(right: 14),
+      child: Row(
+        children: [
+          const DsBadge(
+            label: 'Periodo 2026/1',
+            tone: BadgeTone.success,
+            icon: Icons.circle,
+          ),
+          const SizedBox(width: 14),
+          Container(width: 1, height: 26, color: AppColors.borderSubtle),
+        ],
+      ),
+    );
+  }
+}
+
 class _AdminChip extends StatelessWidget {
   const _AdminChip({required this.name});
 
@@ -94,7 +126,11 @@ class _AdminChip extends StatelessWidget {
             height: 32,
             alignment: Alignment.center,
             decoration: const BoxDecoration(
-              color: AppColors.guinda600,
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [AppColors.guinda500, AppColors.guinda700],
+              ),
               shape: BoxShape.circle,
             ),
             child: Text(
@@ -189,34 +225,48 @@ class _DashboardDataView extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
-        DsCard(
-          child: Row(
+        GradientHero(
+          borderRadius: AppRadii.rxl,
+          shadow: AppShadows.lg,
+          padding: const EdgeInsets.all(28),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                width: 56,
-                height: 56,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: AppColors.primarySoft,
-                  borderRadius: AppRadii.rmd,
-                ),
-                child: const Icon(Icons.verified_user_outlined,
-                    size: 28, color: AppColors.primary),
+              Row(
+                children: [
+                  const Icon(Icons.calendar_today_outlined,
+                      size: 14, color: AppColors.azul200),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Periodo 2026/1',
+                    style: AppType.mono(size: 12.5, color: AppColors.azul200),
+                  ),
+                ],
               ),
-              const SizedBox(width: 18),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+              const SizedBox(height: 10),
+              Text(
+                'Resumen administrativo',
+                style: AppType.serif(size: 28, color: Colors.white, height: 1.1),
+              ),
+              const SizedBox(height: 8),
+              Text.rich(
+                TextSpan(
+                  style: AppType.sans(
+                    size: 15,
+                    color: AppColors.textOnDark.withValues(alpha: 0.82),
+                  ),
                   children: [
-                    Text(
-                      'Resumen administrativo',
-                      style: AppType.serif(size: 24),
+                    const TextSpan(text: 'Tienes '),
+                    TextSpan(
+                      text: '${dashboard.totalEts} exámenes',
+                      style: AppType.sans(
+                        size: 15,
+                        weight: FontWeight.w700,
+                        color: Colors.white,
+                      ),
                     ),
-                    const SizedBox(height: 2),
-                    Text(
-                      'Consulta estadísticas y administra la oferta de ETS.',
-                      style:
-                          AppType.sans(size: 14, color: AppColors.textMuted),
+                    const TextSpan(
+                      text: ' programados y la oferta lista para administrar.',
                     ),
                   ],
                 ),
@@ -244,6 +294,7 @@ class _DashboardDataView extends StatelessWidget {
                 value: '${dashboard.totalEts}',
                 label: 'ETS registrados',
                 icon: Icons.event_available_outlined,
+                hint: 'periodo 26/1',
               ),
               StatTile(
                 value: '${dashboard.totalCareers}',
@@ -370,17 +421,32 @@ class _CareerStatRow extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 7),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(99),
-                child: TweenAnimationBuilder<double>(
-                  tween: Tween(begin: 0, end: fraction),
-                  duration: AppMotion.slow,
-                  curve: AppMotion.easeOut,
-                  builder: (context, value, _) => LinearProgressIndicator(
-                    value: value,
-                    minHeight: 8,
-                    backgroundColor: AppColors.surfaceSunken,
-                    valueColor: const AlwaysStoppedAnimation(AppColors.primary),
+              SizedBox(
+                height: 10,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(99),
+                  child: Stack(
+                    children: [
+                      const Positioned.fill(
+                        child: ColoredBox(color: AppColors.surfaceSunken),
+                      ),
+                      TweenAnimationBuilder<double>(
+                        tween: Tween(begin: 0, end: fraction.clamp(0, 1)),
+                        duration: AppMotion.slow,
+                        curve: AppMotion.easeOut,
+                        builder: (context, value, _) => FractionallySizedBox(
+                          alignment: Alignment.centerLeft,
+                          widthFactor: value <= 0 ? 0.001 : value,
+                          child: const DecoratedBox(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [AppColors.azul500, AppColors.azul700],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),

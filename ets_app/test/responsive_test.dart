@@ -1,4 +1,7 @@
+import 'package:ets_app/core/theme/app_colors.dart';
 import 'package:ets_app/core/theme/app_theme.dart';
+import 'package:ets_app/core/theme/app_tokens.dart';
+import 'package:ets_app/core/theme/app_typography.dart';
 import 'package:ets_app/core/widgets/ds_widgets.dart';
 import 'package:ets_app/features/ets/domain/entities/ets.dart';
 import 'package:ets_app/features/ets/presentation/ets_detail_screen.dart';
@@ -199,5 +202,279 @@ void main() {
       );
       expect(tester.takeException(), isNull);
     });
+  });
+
+  // ===== Diseño v2: heroes oscuros, PageHero, FormPanel y fila de ETS =====
+
+  group('Hero oscuro v2 (consulta/dashboard) sin overflow', () {
+    for (final size in _mobileSizes) {
+      testWidgets('${size.width.toInt()}px', (tester) async {
+        await _pumpAt(
+          tester,
+          size,
+          Scaffold(
+            body: SingleChildScrollView(
+              child: GradientHero(
+                borderRadius: null,
+                showHexMotif: true,
+                padding: const EdgeInsets.fromLTRB(20, 30, 20, 46),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Eyebrow(
+                      'Exámenes a Título de Suficiencia · Periodo 2026',
+                      color: AppColors.azul200,
+                    ),
+                    const SizedBox(height: 12),
+                    Text('Consulta tu calendario de ETS',
+                        style: AppType.serif(size: 34, color: Colors.white)),
+                    const SizedBox(height: 12),
+                    Text(
+                      'Filtra por carrera, plan, semestre y materia.',
+                      style: AppType.sans(size: 16, color: Colors.white),
+                    ),
+                    const SizedBox(height: 22),
+                    const Wrap(
+                      spacing: 10,
+                      runSpacing: 10,
+                      children: [
+                        HeroPill(
+                          icon: Icons.event_available_outlined,
+                          label: '8 exámenes publicados',
+                        ),
+                        HeroPill(
+                          icon: Icons.school_outlined,
+                          label: '3 carreras',
+                        ),
+                        HeroPill(
+                          icon: Icons.download_outlined,
+                          label: 'Exporta a PDF · iCalendar',
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+        expect(tester.takeException(), isNull);
+      });
+    }
+  });
+
+  group('PageHero v2 (catálogos/ETS) sin overflow', () {
+    for (final size in _mobileSizes) {
+      testWidgets('${size.width.toInt()}px', (tester) async {
+        await _pumpAt(
+          tester,
+          size,
+          Scaffold(
+            body: SingleChildScrollView(
+              padding: const EdgeInsets.all(20),
+              child: GradientHero(
+                borderRadius: AppRadii.rxl,
+                padding: const EdgeInsets.all(26),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const HeroIconDisc(icon: Icons.event_available_outlined),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Eyebrow('Programación',
+                                  color: AppColors.azul200),
+                              const SizedBox(height: 6),
+                              Text('Exámenes a Título de Suficiencia',
+                                  style: AppType.serif(
+                                      size: 24, color: Colors.white)),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    const HeroPill(
+                      icon: Icons.event_note_outlined,
+                      label: '8 ETS en total',
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+        expect(tester.takeException(), isNull);
+      });
+    }
+  });
+
+  testWidgets('FormPanel v2 sin overflow a 300px', (tester) async {
+    await _pumpAt(
+      tester,
+      const Size(300, 640),
+      Scaffold(
+        body: Padding(
+          padding: const EdgeInsets.all(20),
+          child: FormPanel(
+            title: 'Nueva carrera',
+            children: [
+              TextFormField(
+                decoration: const InputDecoration(labelText: 'Código'),
+              ),
+              const SizedBox(height: 12),
+              FilledButton(onPressed: () {}, child: const Text('Crear carrera')),
+            ],
+          ),
+        ),
+      ),
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  group('Fila de ETS v2 (barra lateral + date chip) sin overflow', () {
+    for (final size in _mobileSizes) {
+      testWidgets('${size.width.toInt()}px', (tester) async {
+        final compact = size.width < 360;
+        await _pumpAt(
+          tester,
+          size,
+          Scaffold(
+            body: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: AppColors.surface,
+                  borderRadius: AppRadii.rmd,
+                  border: Border.all(color: AppColors.borderSubtle),
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: IntrinsicHeight(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Container(width: 4, color: AppColors.warning),
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              if (!compact) ...[
+                                Container(
+                                  width: 46,
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 7),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.surfaceMuted,
+                                    borderRadius: AppRadii.rsm,
+                                    border: Border.all(
+                                        color: AppColors.borderSubtle),
+                                  ),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text('22',
+                                          style: AppType.serif(
+                                              size: 21,
+                                              color: AppColors.azul700)),
+                                      Text('JUN',
+                                          style: AppType.mono(
+                                              size: 10.5,
+                                              color: AppColors.textMuted)),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(width: 11),
+                              ],
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        const CareerBadge(
+                                            code: 'ISC', size: 26),
+                                        const SizedBox(width: 9),
+                                        Flexible(
+                                          child: Text(
+                                            'Análisis y Diseño de Algoritmos',
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: AppType.sans(
+                                                size: 15,
+                                                weight: FontWeight.w700),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 5),
+                                    Text(
+                                      'Plan 2020 · 6° semestre · 14:30 h · 2204 · Edificio 2',
+                                      style: AppType.mono(
+                                          size: 12.5,
+                                          color: AppColors.textMuted),
+                                    ),
+                                    const SizedBox(height: 9),
+                                    Row(
+                                      children: [
+                                        const DsBadge(
+                                          label: 'Vespertino',
+                                          tone: BadgeTone.info,
+                                          icon: Icons.nights_stay_outlined,
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Expanded(
+                                          child: Text(
+                                            'Dra. María Fernanda González',
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: AppType.sans(size: 13),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Column(
+                                children: [
+                                  IconButton(
+                                    onPressed: () {},
+                                    padding: EdgeInsets.zero,
+                                    constraints: const BoxConstraints(
+                                        minWidth: 34, minHeight: 34),
+                                    icon: const Icon(Icons.edit_outlined,
+                                        size: 18),
+                                  ),
+                                  IconButton(
+                                    onPressed: () {},
+                                    padding: EdgeInsets.zero,
+                                    constraints: const BoxConstraints(
+                                        minWidth: 34, minHeight: 34),
+                                    icon: const Icon(Icons.delete_outline,
+                                        size: 18),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+        expect(tester.takeException(), isNull);
+      });
+    }
   });
 }

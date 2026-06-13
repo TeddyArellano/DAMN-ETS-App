@@ -26,6 +26,12 @@ class EtsDetailScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Detalle del ETS'),
+        flexibleSpace: const SafeArea(
+          child: Align(
+            alignment: Alignment.topCenter,
+            child: BrandAccentBar(),
+          ),
+        ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),

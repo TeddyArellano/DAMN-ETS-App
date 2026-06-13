@@ -515,22 +515,71 @@ class _EtsCrudScreenState extends ConsumerState<EtsCrudScreen> {
             onDelete: _deleteExam,
           );
 
-          if (!wideLayout) {
-            return Column(
-              children: [
-                form,
-                const SizedBox(height: 18),
-                list,
-              ],
-            );
-          }
+          final layout = !wideLayout
+              ? Column(
+                  children: [
+                    form,
+                    const SizedBox(height: 18),
+                    list,
+                  ],
+                )
+              : Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(width: 440, child: form),
+                    const SizedBox(width: 18),
+                    Expanded(child: list),
+                  ],
+                );
 
-          return Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              SizedBox(width: 440, child: form),
-              const SizedBox(width: 18),
-              Expanded(child: list),
+              GradientHero(
+                borderRadius: AppRadii.rxl,
+                shadow: AppShadows.lg,
+                padding: const EdgeInsets.all(26),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const HeroIconDisc(icon: Icons.event_available_outlined),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Eyebrow('Programación',
+                                  color: AppColors.azul200),
+                              const SizedBox(height: 6),
+                              Text('Exámenes a Título de Suficiencia',
+                                  style: AppType.serif(
+                                      size: 24, color: Colors.white, height: 1.1)),
+                              const SizedBox(height: 4),
+                              Text(
+                                'Registra, edita y consulta los ETS del periodo.',
+                                style: AppType.sans(
+                                  size: 14,
+                                  color: AppColors.textOnDark
+                                      .withValues(alpha: 0.8),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    HeroPill(
+                      icon: Icons.event_note_outlined,
+                      label: '${etsState.value?.length ?? 0} ETS en total',
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 22),
+              layout,
             ],
           );
         },
@@ -1064,88 +1113,164 @@ class _AdminEtsItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final date = DateFormat(
-      'dd/MM/yyyy · HH:mm',
-    ).format(exam.fecha.toLocal());
-
+    final local = exam.fecha.toLocal();
+    final day = DateFormat('dd').format(local);
+    final month = DateFormat('MMM', 'es_MX').format(local).toUpperCase();
+    final shortDate = DateFormat('dd/MM').format(local);
+    final hora = DateFormat('HH:mm').format(local);
     final isMorning = exam.turno.toLowerCase().startsWith('mat');
+    final accent = isMorning ? AppColors.warning : AppColors.primary;
+    // En móviles angostos se oculta el date chip (la fecha pasa a la línea de
+    // detalle) para dar espacio al contenido y evitar desbordes.
+    final compact = MediaQuery.sizeOf(context).width < 360;
 
     return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: AppRadii.rmd,
         border: Border.all(color: AppColors.borderSubtle),
       ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          CareerBadge(code: exam.carrera, size: 42),
-          const SizedBox(width: 13),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  exam.ua,
-                  style: AppType.sans(
-                    size: 15,
-                    weight: FontWeight.w700,
-                    color: AppColors.textStrong,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  '${exam.carrera} · Plan ${exam.plan} · ${exam.semestre}° semestre',
-                  style: AppType.mono(size: 12, color: AppColors.textMuted),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  '$date · ${exam.salon} · ${exam.edificio ?? ''}',
-                  style: AppType.mono(size: 12, color: AppColors.textMuted),
-                ),
-                const SizedBox(height: 8),
-                Row(
+      clipBehavior: Clip.antiAlias,
+      child: IntrinsicHeight(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Barra lateral por turno (matutino = ámbar, vespertino = azul).
+            Container(width: 4, color: accent),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    DsBadge(
-                      label: exam.turno,
-                      tone: isMorning ? BadgeTone.warning : BadgeTone.info,
-                      icon: isMorning
-                          ? Icons.wb_sunny_outlined
-                          : Icons.nights_stay_outlined,
-                    ),
-                    const SizedBox(width: 8),
-                    Flexible(
-                      child: Text(
-                        exam.profesor,
-                        overflow: TextOverflow.ellipsis,
-                        style: AppType.sans(
-                          size: 13,
-                          color: AppColors.textBody,
+                    // Date chip (oculto en móviles angostos).
+                    if (!compact) ...[
+                      Container(
+                        width: 46,
+                        padding: const EdgeInsets.symmetric(vertical: 7),
+                        decoration: BoxDecoration(
+                          color: AppColors.surfaceMuted,
+                          borderRadius: AppRadii.rsm,
+                          border: Border.all(color: AppColors.borderSubtle),
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              day,
+                              style: AppType.serif(
+                                size: 21,
+                                color: AppColors.azul700,
+                                height: 1,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              month,
+                              style: AppType.mono(
+                                  size: 10.5, color: AppColors.textMuted),
+                            ),
+                          ],
                         ),
                       ),
+                      const SizedBox(width: 11),
+                    ],
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              CareerBadge(code: exam.carrera, size: 26),
+                              const SizedBox(width: 9),
+                              Flexible(
+                                child: Text(
+                                  exam.ua,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: AppType.sans(
+                                    size: 15,
+                                    weight: FontWeight.w700,
+                                    color: AppColors.textStrong,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 5),
+                          Text(
+                            '${compact ? '$shortDate · ' : ''}Plan ${exam.plan} · ${exam.semestre}° semestre · $hora h · ${exam.salon} · ${exam.edificio ?? ''}',
+                            style: AppType.mono(
+                                size: 12.5, color: AppColors.textMuted),
+                          ),
+                          const SizedBox(height: 9),
+                          Row(
+                            children: [
+                              DsBadge(
+                                label: exam.turno,
+                                tone: isMorning
+                                    ? BadgeTone.warning
+                                    : BadgeTone.info,
+                                icon: isMorning
+                                    ? Icons.wb_sunny_outlined
+                                    : Icons.nights_stay_outlined,
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Row(
+                                  children: [
+                                    const Icon(Icons.person_outline,
+                                        size: 14, color: AppColors.textMuted),
+                                    const SizedBox(width: 4),
+                                    Flexible(
+                                      child: Text(
+                                        exam.profesor,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: AppType.sans(
+                                          size: 13,
+                                          color: AppColors.textBody,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    Column(
+                      children: [
+                        IconButton(
+                          tooltip: 'Editar',
+                          onPressed: onEdit,
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(
+                              minWidth: 34, minHeight: 34),
+                          icon: const Icon(Icons.edit_outlined, size: 18),
+                          color: AppColors.textFaint,
+                          hoverColor: AppColors.primarySoft,
+                        ),
+                        IconButton(
+                          tooltip: 'Eliminar',
+                          onPressed: onDelete,
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(
+                              minWidth: 34, minHeight: 34),
+                          icon: const Icon(Icons.delete_outline, size: 18),
+                          color: AppColors.textFaint,
+                          hoverColor: AppColors.dangerSoft,
+                        ),
+                      ],
                     ),
                   ],
                 ),
-              ],
+              ),
             ),
-          ),
-          IconButton(
-            tooltip: 'Editar',
-            onPressed: onEdit,
-            icon: const Icon(Icons.edit_outlined, size: 19),
-            color: AppColors.textFaint,
-            hoverColor: AppColors.primarySoft,
-          ),
-          IconButton(
-            tooltip: 'Eliminar',
-            onPressed: onDelete,
-            icon: const Icon(Icons.delete_outline, size: 19),
-            color: AppColors.textFaint,
-            hoverColor: AppColors.dangerSoft,
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

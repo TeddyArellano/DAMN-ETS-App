@@ -280,7 +280,13 @@ class _EtsHomeScreenState extends ConsumerState<EtsHomeScreen> {
     final isOffline = sourceResult.asData?.value.fromCache ?? false;
 
     return Scaffold(
-      appBar: AppBar(
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(67),
+        child: Column(
+          children: [
+            const BrandAccentBar(),
+            Expanded(
+              child: AppBar(
         toolbarHeight: 64,
         titleSpacing: 20,
         title: const BrandLockup(subtitle: 'Calendario de exámenes'),
@@ -304,13 +310,21 @@ class _EtsHomeScreenState extends ConsumerState<EtsHomeScreen> {
           ),
           const SizedBox(width: 8),
         ],
+              ),
+            ),
+          ],
+        ),
       ),
       body: RefreshIndicator(
         onRefresh: _refreshData,
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
-            _Hero(userName: user?.name),
+            _Hero(
+              userName: user?.name,
+              etsCount: sourceResult.asData?.value.items.length ?? 0,
+              careerCount: careers.length,
+            ),
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 0, 20, 28),
               child: Column(
@@ -495,51 +509,64 @@ class _EtsHomeScreenState extends ConsumerState<EtsHomeScreen> {
 
 /// Héroe: eyebrow + título serif + descripción, sobre tinte con motivo hexagonal.
 class _Hero extends StatelessWidget {
-  const _Hero({this.userName});
+  const _Hero({
+    this.userName,
+    required this.etsCount,
+    required this.careerCount,
+  });
 
   final String? userName;
+  final int etsCount;
+  final int careerCount;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [AppColors.bgPageTint, AppColors.bgPage],
-        ),
-        border: Border(bottom: BorderSide(color: AppColors.borderSubtle)),
-      ),
-      child: Stack(
+    return GradientHero(
+      borderRadius: null,
+      showHexMotif: true,
+      padding: const EdgeInsets.fromLTRB(20, 30, 20, 46),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Positioned.fill(
-            child: ClipRect(child: HexMotif(opacity: 0.04)),
+          const Eyebrow(
+            'Exámenes a Título de Suficiencia · Periodo 2026',
+            color: AppColors.azul200,
           ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(20, 28, 20, 44),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Eyebrow('Exámenes a Título de Suficiencia · 2026'),
-                const SizedBox(height: 10),
-                Text(
-                  userName == null
-                      ? 'Consulta tu calendario de ETS'
-                      : 'Hola, $userName',
-                  style: AppType.serif(size: 32, height: 1.1),
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  'Filtra por carrera, plan, semestre y materia. Guarda favoritos, '
-                  'programa recordatorios y exporta tu calendario.',
-                  style: AppType.sans(
-                    size: 15,
-                    color: AppColors.textBody,
-                    height: 1.5,
-                  ),
-                ),
-              ],
+          const SizedBox(height: 12),
+          Text(
+            userName == null
+                ? 'Consulta tu calendario de ETS'
+                : 'Hola, $userName',
+            style: AppType.serif(size: 34, color: Colors.white, height: 1.06),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            'Filtra por carrera, plan, semestre y materia. Guarda favoritos, '
+            'programa recordatorios y exporta tu calendario a PDF o iCalendar.',
+            style: AppType.sans(
+              size: 16,
+              color: AppColors.textOnDark.withValues(alpha: 0.85),
+              height: 1.5,
             ),
+          ),
+          const SizedBox(height: 22),
+          Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            children: [
+              HeroPill(
+                icon: Icons.event_available_outlined,
+                label: '$etsCount exámenes publicados',
+              ),
+              HeroPill(
+                icon: Icons.school_outlined,
+                label: '$careerCount carreras',
+              ),
+              const HeroPill(
+                icon: Icons.download_outlined,
+                label: 'Exporta a PDF · iCalendar',
+              ),
+            ],
           ),
         ],
       ),

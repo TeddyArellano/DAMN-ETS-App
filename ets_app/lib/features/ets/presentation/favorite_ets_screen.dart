@@ -265,6 +265,12 @@ class _FavoriteEtsScreenState extends ConsumerState<FavoriteEtsScreen> {
             icon: const Icon(Icons.arrow_back),
         ),
         title: const Text('Mis favoritos'),
+        flexibleSpace: const SafeArea(
+          child: Align(
+            alignment: Alignment.topCenter,
+            child: BrandAccentBar(),
+          ),
+        ),
         actions: [
           if (user != null && MediaQuery.sizeOf(context).width >= 480)
             Padding(
@@ -503,32 +509,31 @@ class _HeaderCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DsCard(
+    return GradientHero(
+      borderRadius: AppRadii.rxl,
+      shadow: AppShadows.lg,
+      padding: const EdgeInsets.all(24),
       child: Row(
         children: [
-          Container(
-            width: 56,
-            height: 56,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: AppColors.warningSoft,
-              borderRadius: AppRadii.rmd,
-            ),
-            child: const Icon(Icons.star_rounded,
-                color: AppColors.amber600, size: 28),
-          ),
+          const HeroIconDisc(icon: Icons.star_rounded),
           const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Mis ETS favoritos', style: AppType.serif(size: 22)),
-                const SizedBox(height: 2),
+                const Eyebrow('Tus exámenes', color: AppColors.azul200),
+                const SizedBox(height: 6),
+                Text('Mis ETS favoritos',
+                    style: AppType.serif(size: 24, color: Colors.white)),
+                const SizedBox(height: 4),
                 Text(
                   totalFavorites == 0
                       ? 'Todavía no tienes ETS guardados.'
                       : 'Consulta rápidamente tus ETS favoritos.',
-                  style: AppType.sans(size: 14, color: AppColors.textMuted),
+                  style: AppType.sans(
+                    size: 14,
+                    color: AppColors.textOnDark.withValues(alpha: 0.8),
+                  ),
                 ),
               ],
             ),

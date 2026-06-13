@@ -4,6 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/ds_widgets.dart';
 
 class SalonMapScreen extends StatefulWidget {
   final String salon;
@@ -136,6 +137,12 @@ class _SalonMapScreenState extends State<SalonMapScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Ubicación salón $salon'),
+        flexibleSpace: const SafeArea(
+          child: Align(
+            alignment: Alignment.topCenter,
+            child: BrandAccentBar(),
+          ),
+        ),
       ),
       body: svgContent == null
           ? const Center(child: CircularProgressIndicator())

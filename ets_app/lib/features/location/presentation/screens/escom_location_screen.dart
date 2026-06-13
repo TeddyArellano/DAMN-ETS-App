@@ -83,6 +83,12 @@ class _EscomLocationScreenState extends State<EscomLocationScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Ubicación de ESCOM'),
+        flexibleSpace: const SafeArea(
+          child: Align(
+            alignment: Alignment.topCenter,
+            child: BrandAccentBar(),
+          ),
+        ),
       ),
       body: loading
           ? const Center(child: CircularProgressIndicator())

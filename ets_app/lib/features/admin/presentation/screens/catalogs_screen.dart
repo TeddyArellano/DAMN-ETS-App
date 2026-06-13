@@ -253,30 +253,92 @@ class _CatalogsScreenState extends ConsumerState<CatalogsScreen> {
             },
           );
 
-          if (!wideLayout) {
-            return Column(
-              children: [
-                careersCard,
-                const SizedBox(height: 18),
-                buildingsCard,
-                const SizedBox(height: 18),
-                subjectsCard,
-              ],
-            );
-          }
+          final cardsLayout = !wideLayout
+              ? Column(
+                  children: [
+                    careersCard,
+                    const SizedBox(height: 18),
+                    buildingsCard,
+                    const SizedBox(height: 18),
+                    subjectsCard,
+                  ],
+                )
+              : Column(
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(child: careersCard),
+                        const SizedBox(width: 18),
+                        Expanded(child: buildingsCard),
+                      ],
+                    ),
+                    const SizedBox(height: 18),
+                    subjectsCard,
+                  ],
+                );
 
           return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(child: careersCard),
-                  const SizedBox(width: 18),
-                  Expanded(child: buildingsCard),
-                ],
+              GradientHero(
+                borderRadius: AppRadii.rxl,
+                shadow: AppShadows.lg,
+                padding: const EdgeInsets.all(26),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const HeroIconDisc(
+                            icon: Icons.collections_bookmark_outlined),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Eyebrow('Administración',
+                                  color: AppColors.azul200),
+                              const SizedBox(height: 6),
+                              Text('Catálogos',
+                                  style: AppType.serif(
+                                      size: 26, color: Colors.white)),
+                              const SizedBox(height: 4),
+                              Text(
+                                'Gestiona carreras, planes de estudio y edificios.',
+                                style: AppType.sans(
+                                  size: 14,
+                                  color: AppColors.textOnDark
+                                      .withValues(alpha: 0.8),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        HeroPill(
+                          icon: Icons.school_outlined,
+                          label:
+                              '${careersState.value?.length ?? 0} carreras',
+                        ),
+                        HeroPill(
+                          icon: Icons.apartment_outlined,
+                          label:
+                              '${buildingsState.value?.length ?? 0} edificios',
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-              const SizedBox(height: 18),
-              subjectsCard,
+              const SizedBox(height: 22),
+              cardsLayout,
             ],
           );
         },

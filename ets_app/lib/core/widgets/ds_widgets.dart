@@ -3,5 +3,7 @@ export 'brand.dart';
 export 'career_badge.dart';
 export 'ds_badge.dart';
 export 'ds_card.dart';
+export 'form_panel.dart';
+export 'gradient_hero.dart';
 export 'hex_motif.dart';
 export 'stat_tile.dart';

@@ -125,6 +125,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         child: SafeArea(
           child: Column(
             children: [
+              const BrandAccentBar(),
               _TopBar(
                 onBack: isLoading ? null : () => context.go('/login'),
               ),
