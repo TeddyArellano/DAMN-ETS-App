@@ -72,4 +72,5 @@ Desarrollar una solución móvil nativa que permita a la comunidad estudiantil d
 
 ## Documentación
 
+- [Arquitectura y Diseño](ARQUITECTURA_Y_DISENO.md) — idea del proyecto, arquitectura, estado actual (backend + app) y roadmap
 - [Documento del Proyecto (PDF)](docs/ProyectoFinal_DAMN_20262.pdf)

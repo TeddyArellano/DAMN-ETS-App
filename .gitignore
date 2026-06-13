@@ -1,0 +1,6 @@
+# macOS
+.DS_Store
+
+# Material de diseño (insumo, no código): el design system ya está traducido a Flutter
+ETS ESCOM Design System.zip
+_design_system_extracted/

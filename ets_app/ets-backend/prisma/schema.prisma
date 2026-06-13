@@ -1,0 +1,94 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  STUDENT
+  ADMIN
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  boleta    String?  @unique
+  role      Role     @default(STUDENT)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Career {
+  id        Int      @id @default(autoincrement())
+  code      String   @unique
+  name      String
+  plans     String[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  ets       Ets[]
+  subjects  Subject[]
+}
+
+model Building {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  ets       Ets[]
+}
+
+model Subject {
+  id        Int      @id @default(autoincrement())
+  name      String
+  plan      String
+  semestre  Int
+
+  careerId  Int
+  career    Career   @relation(fields: [careerId], references: [id], onDelete: Cascade)
+
+  ets       Ets[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([careerId, plan, semestre, name])
+  @@index([careerId])
+  @@index([plan])
+  @@index([semestre])
+}
+
+model Ets {
+  id         Int       @id @default(autoincrement())
+  ua         String
+  plan       String
+  semestre   Int
+  fechaIso   String
+  turno      String
+  salon      String
+  profesor   String
+  correo     String
+
+  careerId   Int
+  buildingId Int?
+  subjectId  Int?
+
+  career     Career    @relation(fields: [careerId], references: [id], onDelete: Restrict)
+  building   Building? @relation(fields: [buildingId], references: [id], onDelete: SetNull)
+  subject    Subject?  @relation(fields: [subjectId], references: [id], onDelete: SetNull)
+
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@index([careerId])
+  @@index([buildingId])
+  @@index([subjectId])
+  @@index([semestre])
+  @@index([fechaIso])
+}
