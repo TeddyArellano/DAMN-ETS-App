@@ -12,9 +12,12 @@ import '../../domain/entities/subject.dart';
 import '../../domain/repositories/admin_repository.dart';
 import '../../domain/usecases/create_building.dart';
 import '../../domain/usecases/create_career.dart';
+import '../../domain/usecases/create_ets.dart';
+import '../../domain/usecases/delete_ets.dart';
 import '../../domain/usecases/get_admin_dashboard.dart';
 import '../../domain/usecases/get_buildings.dart';
 import '../../domain/usecases/get_careers.dart';
+import '../../domain/usecases/update_ets.dart';
 
 final adminRemoteDataSourceProvider = Provider<AdminRemoteDataSource>((ref) {
   return AdminRemoteDataSource(ref.watch(dioProvider));
@@ -44,6 +47,18 @@ final getBuildingsUseCaseProvider = Provider<GetBuildings>((ref) {
 
 final createBuildingUseCaseProvider = Provider<CreateBuilding>((ref) {
   return CreateBuilding(ref.watch(adminRepositoryProvider));
+});
+
+final createEtsUseCaseProvider = Provider<CreateEts>((ref) {
+  return CreateEts(ref.watch(adminRepositoryProvider));
+});
+
+final updateEtsUseCaseProvider = Provider<UpdateEts>((ref) {
+  return UpdateEts(ref.watch(adminRepositoryProvider));
+});
+
+final deleteEtsUseCaseProvider = Provider<DeleteEts>((ref) {
+  return DeleteEts(ref.watch(adminRepositoryProvider));
 });
 
 final adminDashboardProvider =
@@ -215,19 +230,19 @@ class AdminEtsController extends AsyncNotifier<List<Ets>> {
     state = const AsyncLoading();
 
     state = await AsyncValue.guard(() async {
-      await _repository.createEts(
-        ua: ua,
-        subjectId: subjectId,
-        careerId: careerId,
-        plan: plan,
-        semestre: semestre,
-        fechaIso: fechaIso,
-        turno: turno,
-        salon: salon,
-        profesor: profesor,
-        correo: correo,
-        buildingId: buildingId,
-      );
+      await ref.read(createEtsUseCaseProvider).call(
+            ua: ua,
+            subjectId: subjectId,
+            careerId: careerId,
+            plan: plan,
+            semestre: semestre,
+            fechaIso: fechaIso,
+            turno: turno,
+            salon: salon,
+            profesor: profesor,
+            correo: correo,
+            buildingId: buildingId,
+          );
 
       return _repository.getAdminEts();
     });
@@ -252,20 +267,20 @@ class AdminEtsController extends AsyncNotifier<List<Ets>> {
     state = const AsyncLoading();
 
     state = await AsyncValue.guard(() async {
-      await _repository.updateEts(
-        id: id,
-        ua: ua,
-        subjectId: subjectId,
-        careerId: careerId,
-        plan: plan,
-        semestre: semestre,
-        fechaIso: fechaIso,
-        turno: turno,
-        salon: salon,
-        profesor: profesor,
-        correo: correo,
-        buildingId: buildingId,
-      );
+      await ref.read(updateEtsUseCaseProvider).call(
+            id: id,
+            ua: ua,
+            subjectId: subjectId,
+            careerId: careerId,
+            plan: plan,
+            semestre: semestre,
+            fechaIso: fechaIso,
+            turno: turno,
+            salon: salon,
+            profesor: profesor,
+            correo: correo,
+            buildingId: buildingId,
+          );
 
       return _repository.getAdminEts();
     });
@@ -274,7 +289,7 @@ class AdminEtsController extends AsyncNotifier<List<Ets>> {
   }
 
   Future<void> deleteEts(int id) async {
-    await _repository.deleteEts(id);
+    await ref.read(deleteEtsUseCaseProvider).call(id);
 
     final updatedItems = (state.value ?? const <Ets>[])
         .where((item) => item.id != id)
